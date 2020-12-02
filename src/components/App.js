@@ -16,6 +16,12 @@ const App = () => {
   const [passwordError, setPasswordError] = React.useState("");
 
   const handleSubmit = () => {
+    setGreetMessage("");
+    setAllError("");
+    setMailError("");
+    setNumberError("");
+    setGenderError("");
+    setPasswordError("");
     if (
       name === "" ||
       mail === "" ||
