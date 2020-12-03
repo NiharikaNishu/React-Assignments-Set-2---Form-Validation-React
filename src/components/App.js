@@ -1,127 +1,121 @@
-import React, { Component, useState } from "react";
-import "../styles/App.css";
+import React, { useEffect, useState } from "react";
 
 const App = () => {
-  const [greetMessage, setGreetMessage] = React.useState("");
-  const [name, setName] = React.useState("");
-  const [mail, setMail] = React.useState("");
-  const [gender, setGender] = React.useState("male");
-  const [number, setNumber] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [allError, setAllError] = React.useState("");
-  const [nameError, setNameError] = React.useState("");
-  const [mailError, setMailError] = React.useState("");
-  const [genderError, setGenderError] = React.useState("");
-  const [numberError, setNumberError] = React.useState("");
-  const [passwordError, setPasswordError] = React.useState("");
-
-  const handleSubmit = () => {
-    setGreetMessage("");
-    setAllError("");
-    setMailError("");
-    setNumberError("");
-    setGenderError("");
-    setPasswordError("");
+  let error = false;
+  let [ErrorMessage, setErrorMessage] = useState("");
+  const [input, setinput] = useState([
+    {
+      name: "",
+      email: "",
+      gender: "male",
+      phone: "",
+      password: ""
+    }
+  ]);
+  function ValidateEmail(mail) {
     if (
-      name === "" ||
-      mail === "" ||
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
+        mail
+      )
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+  const handleclick = () => {
+    let main = input[0];
+    console.log(main);
+    let temp = main["name"];
+    let address = main["email"];
+    let password = main["password"];
+    let gender = main["gender"];
+    let phone = main["phone"];
+    if (
+      temp === "" ||
+      address === "" ||
+      password === "" ||
       gender === "" ||
-      number === "" ||
-      password === ""
+      phone === ""
     ) {
-      setGreetMessage("");
-      setAllError("All fields are mandatory");
+      setErrorMessage("All fields are mandatory");
       return;
     }
-    setAllError("");
+    let cnt1 = 0;
+    let cnt2 = 0;
+    for (let i = 0; i < temp.length; i++) {
+      if (
+        (temp[i] >= "a" && temp[i] <= "z") ||
+        (temp[i] >= "A" && temp[i] <= "Z")
+      ) {
+        cnt1++;
+      } else if (Number(temp[i]) >= 0 && Number(temp[i]) <= 9) {
+        cnt2++;
+      }
+      if (cnt1 && cnt2) {
+        break;
+      }
+    }
 
-    if (!mail.includes("@")) {
-      setMailError("Email must contain @");
+    if (!cnt1 || !cnt2) {
+      setErrorMessage("Name is not alphanumeric");
+      return;
+    } else if (!ValidateEmail(address)) {
+      setErrorMessage("Email must contain @");
       return;
     }
-    setMailError("");
-    if (isNaN(number)) {
-      setNumberError("Phone Number must contain only numbers");
-      return;
-    }
-    setNumberError("");
-    if (
-      gender.toLowerCase() !== "male" &&
-      gender.toLowerCase() !== "female" &&
-      gender.toLowerCase() !== "others"
-    ) {
-      setGenderError("Please identify as male, female or others");
-      return;
-    }
-    setGenderError("");
 
-    if (password.length < 6) {
-      setPasswordError("Password must contain atleast 6 letters");
+    if (isNaN(main["phone"])) {
+      setErrorMessage("Phone Number must contain only numbers");
       return;
     }
-    setPasswordError("");
-    setGreetMessage(getName());
+    if (main["password"].length < 6) {
+      setErrorMessage("Password must contain atleast 6 letters");
+      return;
+    }
+    let info = main["email"];
+    info = info.substr(0, info.indexOf("@"));
+    console.log(info);
+    setErrorMessage("Hello " + info);
   };
-  const getName = () => {
-    return "Hello " + mail.split("@")[0];
-  };
-  const handleNameChange = (e) => {
-    setName(e.target.value);
-  };
-  const handleMailChange = (e) => {
-    setMail(e.target.value);
-  };
-  const handleGenderChange = (e) => {
-    setGender(e.target.value);
-  };
-  const handleNumberChange = (e) => {
-    setNumber(e.target.value);
-  };
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
+  const handlechange = (e) => {
+    let dup = input;
+    dup = dup[0];
+    dup[e.target.name] = e.target.value;
+    setinput([dup]);
   };
   return (
-    <>
-      <div id="main">
-        <input
-          data-testid="name"
-          onChange={handleNameChange}
-          required
-          value={name}
-        />
-        <input
-          data-testid="email"
-          onChange={handleMailChange}
-          required
-          value={mail}
-        />
-        <input
-          data-testid="gender"
-          onChange={handleGenderChange}
-          required
-          value={gender}
-        />
-        <input
-          data-testid="phoneNumber"
-          onChange={handleNumberChange}
-          value={number}
-        />
-        <input
-          data-testid="password"
-          type="password"
-          onChange={handlePasswordChange}
-          value={password}
-        />
-        <input data-testid="submit" type="submit" onClick={handleSubmit} />
-        {greetMessage !== "" && <div>{greetMessage}</div>}
-        {allError !== "" && <div>{allError}</div>}
-        {nameError !== "" && <div>{nameError}</div>}
-        {mailError !== "" && <div>{mailError}</div>}
-        {genderError !== "" && <div>{genderError}</div>}
-        {numberError !== "" && <div>{numberError}</div>}
-        {passwordError !== "" && <div>{passwordError}</div>}
-      </div>
-    </>
+    <div id="main">
+      <div>{ErrorMessage}</div>
+      <label>Name:</label>
+      <input data-testid="name" name="name" onChange={handlechange} />
+      <br />
+      <label>Email address:</label>
+      <input data-testid="email" name="email" onChange={handlechange} />
+      <br />
+      <label>Gender:</label>
+      <input
+        value="male"
+        data-testid="gender"
+        name="gender"
+        onChange={handlechange}
+      />
+      <br />
+      <label>Phone number:</label>
+      <input data-testid="phoneNumber" name="phone" onChange={handlechange} />
+      <br />
+      <label>Password:</label>
+      <input
+        data-testid="password"
+        type="password"
+        name="password"
+        onChange={handlechange}
+      />
+      <br />
+      <button data-testid="submit" onClick={handleclick}>
+        Submit
+      </button>
+    </div>
   );
 };
 
